@@ -10,4 +10,4 @@ COPY ping-exporter.py /usr/local/bin/ping-exporter.py
 LABEL maintainer="Juan Orti Alcaine <jortialc@redhat.com>" \
     description="Prometheus ping exporter"
 USER ping-exporter:ping-exporter
-CMD ["/usr/local/bin/ping-exporter.py"]
+ENTRYPOINT ["/usr/local/bin/ping-exporter.py"]

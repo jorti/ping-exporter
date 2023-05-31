@@ -1,6 +1,6 @@
 #!/usr/bin/python3
-from http.server import HTTPServer, BaseHTTPRequestHandler
-from socketserver import ThreadingMixIn
+from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
+import socket
 import threading
 import sys
 import subprocess
@@ -8,12 +8,14 @@ from urllib.parse import parse_qs, urlparse
 import logging
 import os
 
+
 def locate(file):
     #Find the path for fping
     for path in os.environ["PATH"].split(os.pathsep):
         if os.path.exists(os.path.join(path, file)):
                 return os.path.join(path, file)
     return "{}".format(file)
+
 
 def ping(host, prot, interval, count, size, source):
     # Using source address?
@@ -47,8 +49,9 @@ def ping(host, prot, interval, count, size, source):
     output.append('')
     return output
 
-class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
-    """Handle requests in a separate thread."""
+class HTTPServerV6(ThreadingHTTPServer):
+    address_family = socket.AF_INET6
+
 
 class GetHandler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -90,6 +93,7 @@ class GetHandler(BaseHTTPRequestHandler):
         self.wfile.write(message.encode('utf8'))
         return
 
+
 if __name__ == '__main__':
     #Locate the path of fping
     global filepath
@@ -106,6 +110,6 @@ if __name__ == '__main__':
     else:
         port = 8085
     logger.info('Starting server port {}, use <Ctrl-C> to stop'.format(port))
-    server = ThreadedHTTPServer(('0.0.0.0', port), GetHandler)
+    server = HTTPServerV6(('', port), GetHandler)
     server.serve_forever()
 
